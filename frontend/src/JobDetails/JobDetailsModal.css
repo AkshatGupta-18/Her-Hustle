@@ -1,0 +1,115 @@
+/* Modal overlay */
+.job-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  padding: 1rem;
+  overflow-y: auto; /* allows modal to scroll if screen is small */
+}
+
+/* Modal content */
+.job-modal-content {
+  background: #fff;
+  padding: 25px 30px;
+  border-radius: 12px;
+  max-width: 500px;
+  width: 100%;
+  max-height: 80vh; /* ensures content fits on screen */
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  animation: fadeIn 0.3s ease;
+  overflow: hidden;
+}
+
+/* Scrollable body */
+.job-modal-body {
+  overflow-y: auto;
+  padding-right: 5px; /* avoids scrollbar overlapping content */
+  margin-bottom: 15px;
+}
+
+/* Scrollbar styling for modern browsers */
+.job-modal-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.job-modal-body::-webkit-scrollbar-thumb {
+  background-color: rgba(0,0,0,0.3);
+  border-radius: 3px;
+}
+
+.job-modal-content h2 {
+  color: #ff3366;
+  margin-bottom: 15px;
+}
+
+/* Modal buttons */
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  align-items: center;
+}
+
+.modal-buttons button {
+  padding: 0 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Apply button */
+.apply-btn {
+  background-color: #28a745;
+  color: white;
+}
+
+.apply-btn:hover {
+  background-color: #218838;
+}
+
+/* Back button */
+.back-btn {
+  background-color: #dc3545;
+  color: white;
+}
+
+.back-btn:hover {
+  background-color: #c82333;
+}
+
+/* Fade in animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.applied-btn {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: not-allowed;
+  opacity: 0.9;
+}
+
+.applied-btn:hover {
+  background-color: #4caf50; /* no hover effect */
+}
+

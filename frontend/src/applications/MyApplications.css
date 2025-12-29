@@ -1,0 +1,125 @@
+.applications-page-section {
+  background: #fff0f5;
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  min-height: 80vh;
+  transition: 0.3s;
+}
+
+.loading-text {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #ff3366;
+}
+
+.empty-state {
+  text-align: center;
+  color: #555;
+  padding: 4rem 0;
+}
+
+.empty-icon {
+  font-size: 3rem;
+  color: #ff3366;
+  margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+  color: #ff3366;
+  margin-bottom: 0.5rem;
+}
+
+.applications-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+
+.application-card {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+}
+
+.application-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+}
+
+.application-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.application-header h3 {
+  color: #ff3366;
+  font-size: 1.2rem;
+}
+
+.status-badge {
+  background: #89f171;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: bold;
+  padding: 0.3rem 0.7rem;
+  border-radius: 0.5rem;
+}
+
+.application-card p {
+  margin: 0.4rem 0;
+  color: #333;
+}
+
+.date-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+  color: #666;
+  margin-top: 0.5rem;
+}
+
+.clock-icon {
+  color: #ff6699;
+}
+
+.application-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1.2rem;
+}
+
+.application-actions button {
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.6rem 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.view-btn {
+  background: #ffd4e2;
+  color: #ff3366;
+  border: 2px solid #ff3366;
+}
+
+.view-btn:hover {
+  background: #ff3366;
+  color: white;
+}
+
+.contact-btn {
+  background: #ff3366;
+  color: white;
+}
+
+.contact-btn:hover {
+  background: #ff6699;
+}

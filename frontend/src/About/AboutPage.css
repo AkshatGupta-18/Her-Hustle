@@ -1,0 +1,82 @@
+.about-section, .mission-section, .role-section, .safety-section, .vision-section {
+  background: #fff0f5;
+  border-radius: 1rem;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  text-align: center;
+  transition: transform 0.2s ease;
+}
+
+.about-section:hover,
+.mission-section:hover,
+.role-section:hover,
+.safety-section:hover,
+.vision-section:hover {
+  transform: translateY(-3px);
+}
+
+.about-section h2,
+.mission-section h2,
+.role-section h2,
+.safety-section h2,
+.vision-section h2 {
+  color: #ff3366;
+  margin-bottom: 1rem;
+  font-size: 1.6rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.about-section p,
+.mission-section p,
+.safety-section p,
+.vision-section p {
+  color: #444;
+  font-size: 1rem;
+  line-height: 1.8;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Role Section Grid */
+.role-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.role-card {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.role-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+}
+
+.role-card h3 {
+  color: #ff3366;
+  margin-bottom: 0.6rem;
+}
+
+.role-card p {
+  color: #555;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* Footer */
+.about-footer {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #777;
+  margin-top: 3rem;
+}
