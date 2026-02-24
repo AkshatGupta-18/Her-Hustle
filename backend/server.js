@@ -1,13 +1,16 @@
+const dotenv = require('dotenv');
+dotenv.config();
 const express = require('express');
 const mongoose = require('mongoose');
-const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
+const applicationRoutes = require('./routes/applicationRoutes');
+
+
 
 const jobRoutes = require('./routes/jobRoutes');
 const userRoutes = require('./routes/user.routes');
 
-dotenv.config();
 
 const app = express();
 
@@ -28,13 +31,20 @@ mongoose
   .then(() => console.log('✅ MongoDB connected'))
   .catch((err) => console.error('❌ MongoDB connection error:', err));
 
+
+
+app.use('/api/applications', applicationRoutes);
+
 // User auth routes
 app.use('/api/user', userRoutes);
 
 // Job routes
 app.use('/api/jobs', jobRoutes);
 
+
 app.get('/', (req, res) => res.send('Server started 🚀'));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+

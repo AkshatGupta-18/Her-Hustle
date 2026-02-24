@@ -15,8 +15,9 @@ export default function AboutPage({ userName = 'Job Seeker' }) {
       <Sidebar sidebarOpen={sidebarOpen} />
 
       <main className="seeker-main">
-        <Navbar />
-        <div className="top-bar">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Navbar />
+          <div className="top-bar">
           <button className="hamburger" onClick={toggleSidebar}>
             <FaBars />
           </button>
@@ -124,6 +125,7 @@ export default function AboutPage({ userName = 'Job Seeker' }) {
           <p>© 2025 Her Hustle | Empowering Women, One Hustle at a Time</p>
         </footer>
         <Footer />
+        </div>
       </main>
     </div>
   );

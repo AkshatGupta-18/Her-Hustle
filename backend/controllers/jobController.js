@@ -2,7 +2,7 @@ const Job = require('../models/Job');
 
 const createJob = async (req, res) => {
   try {
-    const { title, description, details, type, payment } = req.body;
+    const { title, description, details, type, payment, skills } = req.body;
 
     if (!title || !description || !details || !payment) {
       return res.status(400).json({ message: 'All fields are required' });
@@ -14,6 +14,7 @@ const createJob = async (req, res) => {
       details,
       type,
       payment,
+      skills,
       organizer: req.user.id, // ✅ assign during request, NOT in schema
     });
 
@@ -26,13 +27,31 @@ const createJob = async (req, res) => {
   }
 };
 
+getJobsByUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Invalid user id' });
+    }
+
+    const jobs = await Job.find({ organizer: id })
+      .sort({ createdAt: -1 });
+
+    res.status(200).json(jobs);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 const getMyJobs = async (req, res) => {
   try {
     const jobs = await Job.find({ organizer: req.user.id }).sort({
       createdAt: -1,
     });
 
-    res.json({ jobs });
+    res.json(jobs);
   } catch (err) {
     console.error('Fetch jobs error:', err);
     res.status(500).json({ message: 'Server error' });
@@ -54,8 +73,11 @@ getAllJobs = async (req, res) => {
 };
 
 
+
+
 module.exports = {
   createJob,
   getMyJobs,
-  getAllJobs
+  getAllJobs,
+  getJobsByUser
 };

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { FaBars, FaTimes, FaSearch, FaUserCircle } from 'react-icons/fa';
+import { FaBars, FaTimes, FaUserCircle } from 'react-icons/fa';
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -14,7 +14,6 @@ export default function Navbar() {
   const navigate = useNavigate();
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
-  const [search, setSearch] = useState('');
 
   /* -------------------------
      TEMP: Local auth state
@@ -48,12 +47,12 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="sticky top-0 z-50 bg-white/75 backdrop-blur-sm border-b border-gray-100 shadow-sm">
+    <nav className="relative sticky top-0 z-50 bg-white/75 backdrop-blur-sm border-b border-gray-100 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Left: brand + nav (desktop) */}
           <div className="flex items-center gap-6">
-            <Link to="/" className="text-2xl font-extrabold text-pink-600 hover:text-pink-500">Her Hustle</Link>
+            <Link to="/" className="text-2xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-pink-700">Her Hustle</Link>
             <nav className="hidden md:flex items-center space-x-4 text-gray-700">
               <Link to="/" className="py-2 px-3 rounded-md hover:bg-pink-50 transition">Home</Link>
               <Link to="/about" className="py-2 px-3 rounded-md hover:bg-pink-50 transition">About</Link>
@@ -61,23 +60,17 @@ export default function Navbar() {
             </nav>
           </div>
 
-          {/* Center: search (desktop) */}
-          <div className="hidden md:flex flex-1 justify-center px-4">
-            <div className="w-full max-w-lg">
-              <div className="flex items-center bg-white border border-gray-100 rounded-full shadow-sm px-3 py-1">
-                <FaSearch className="text-gray-400 mr-2" />
-                <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search jobs, skills, companies" className="w-full text-sm placeholder-gray-400 outline-none" />
-              </div>
-            </div>
-          </div>
+          {/* Center spacer (search removed) */}
+          <div className="hidden md:block flex-1" />
 
           {/* Right: actions */}
           <div className="flex items-center gap-3">
             {userName && location.pathname !== '/' && !loggedOut ? (
               <button
-                onClick={() => setShowUserModal(true)}
+                onClick={() => setShowUserModal((s) => !s)}
                 className="hidden md:inline-flex items-center gap-2 px-3 py-2 rounded-full bg-pink-50 text-pink-600 border border-pink-100 hover:bg-pink-100 transition"
-                aria-haspopup="dialog"
+                aria-haspopup="menu"
+                aria-expanded={showUserModal}
               >
                 <span className="sr-only">Open user menu</span>
                 <div className="w-8 h-8 rounded-full bg-pink-100 flex items-center justify-center text-pink-600">
@@ -124,43 +117,32 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* User modal */}
-      {showUserModal && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white w-11/12 max-w-md rounded-xl p-6 shadow-xl">
-            {!loggedOut ? (
-              <>
-                <h3 className="text-lg font-semibold text-pink-600 mb-3">User Info</h3>
-                <p className="text-sm text-gray-700"><strong>Name:</strong> {userName}</p>
-                <p className="text-sm text-gray-700"><strong>Email:</strong> {userEmail}</p>
-                <p className="text-sm text-gray-700 mb-4"><strong>Role:</strong> {userRole}</p>
-                <div className="flex justify-end gap-3">
-                  <button
-                    className="px-4 py-2 rounded-md bg-gray-100 text-gray-700"
-                    onClick={() => setShowUserModal(false)}
-                  >
-                    Close
-                  </button>
-                  <button
-                    className="px-4 py-2 rounded-md bg-pink-600 text-white"
-                    onClick={handleLogout}
-                  >
-                    Logout
-                  </button>
-                </div>
-              </>
-            ) : (
-              <>
-                <h3 className="text-lg font-semibold text-pink-600 mb-3">Logged Out</h3>
-                <p className="text-sm text-gray-700">You have been logged out successfully.</p>
-                <div className="flex justify-end mt-4">
-                  <button className="px-4 py-2 rounded-md bg-pink-600 text-white" onClick={handleClose}>Close</button>
-                </div>
-              </>
-            )}
+      {/* User dropdown / status */}
+      {showUserModal ? (
+        !loggedOut ? (
+          <div className="absolute right-4 top-16 bg-white rounded-xl shadow-lg border border-gray-100 w-56 py-2 z-50">
+            <div className="px-4 py-2 text-sm text-gray-700">
+              <div className="font-semibold text-pink-600">{userName}</div>
+              <div className="text-xs text-gray-400">{userEmail}</div>
+            </div>
+            <div className="border-t border-gray-100 mt-2 pt-2 px-2">
+              <Link to="/profile" className="block px-3 py-2 rounded hover:bg-gray-50">My Profile</Link>
+              <Link to="/applications" className="block px-3 py-2 rounded hover:bg-gray-50">My Applications</Link>
+              <button onClick={handleLogout} className="w-full text-left px-3 py-2 rounded text-red-600 hover:bg-gray-50">Logout</button>
+            </div>
           </div>
-        </div>
-      )}
+        ) : (
+          <div className="absolute right-4 top-16 bg-white rounded-xl shadow-lg border border-gray-100 w-56 py-2 z-50">
+            <div className="px-4 py-3 text-sm">
+              <div className="font-semibold text-pink-600 mb-1">Logged Out</div>
+              <div className="text-gray-600">You are logged out.</div>
+              <div className="mt-3 text-right">
+                <button className="px-3 py-1 rounded-md bg-pink-600 text-white text-sm" onClick={() => { setShowUserModal(false); navigate('/'); }}>Close</button>
+              </div>
+            </div>
+          </div>
+        )
+      ) : null}
     </nav>
   );
 }

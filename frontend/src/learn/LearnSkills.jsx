@@ -46,6 +46,7 @@ export default function LearnSkills() {
     <div className="learn-page-wrapper">
       <Sidebar sidebarOpen={sidebarOpen} />
       <main className={`learn-main ${sidebarOpen ? 'shifted' : ''}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="top-bar">
           <button className="hamburger" onClick={toggleSidebar}>☰</button>
           <h1>Learn Skills</h1>
@@ -90,6 +91,7 @@ export default function LearnSkills() {
             ))}
           </div>
         )}
+        </div>
       </main>
     </div>
   );

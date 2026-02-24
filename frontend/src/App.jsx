@@ -9,14 +9,16 @@ import OrganizerDashboard from './organizer/OrganizerDashboard';
 import OrganizerPostJob from './postJob/OrganizerPostJob';
 import MyProfile from './profile/MyProfile';
 import LearnSkills from './learn/LearnSkills';
+import { UserProvider } from './context/UserContext';
 import AboutPage from './About/AboutPage';
 import ContactPage from './Contact/ContactPage';
-import MyApplications from './applications/MyApplications';
-import ApplicantsPage from './applicants/ApplicantsPage';
+import organizerdashboard from './organizer/OrganizerDashboard';
+import Applications from './applications/Applications';
 
 function App() {
   return (
     <Router>
+      <UserProvider>
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/register" element={<Register />} />
@@ -29,11 +31,12 @@ function App() {
         <Route path="/learn-skills" element={<LearnSkills />} />
         <Route path='/about' element={<AboutPage/>} ></Route>
         <Route path='/contact' element={<ContactPage/>} ></Route>
-        <Route path='/applications' element={<MyApplications/>} ></Route>
-        <Route path='/organizer/applicants' element={<ApplicantsPage/>} ></Route>
         <Route path='/organizer/about' element = {<AboutPage/>} ></Route>
+        <Route path='/organizer/dashboard' element={<OrganizerDashboard />} />
+        <Route path='/organizer/applications' element={<Applications />} />
 
       </Routes>
+      </UserProvider>
     </Router>
   );
 }

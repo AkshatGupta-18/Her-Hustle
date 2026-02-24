@@ -19,6 +19,10 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       trim: true
     },
+    avatarUrl: {
+      type: String,
+      default: ''
+    },
     password: {
       type: String,
       required: true
@@ -28,6 +32,11 @@ const userSchema = new mongoose.Schema(
       required: true,
       trim: true
     },
+    resumeUrl: {
+      type: String,
+      default: ''
+    }
+    ,
     contact: {
       type: String,
       required: true,
@@ -37,7 +46,9 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ['Job Seeker', 'Organizer'],
       default: 'Job Seeker'
-    }
+    },
+    savedJobs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Job' }],
+
   },
   {
     timestamps: true // automatically adds createdAt and updatedAt
