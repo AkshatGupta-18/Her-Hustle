@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import toast, { Toaster } from 'react-hot-toast';
 import Seekernav from "../seekernav/Seekernav";
@@ -19,7 +19,7 @@ import {
 } from "react-icons/fa";
 import Sidebar from "../sidebar/Sidebar";
 
-const JobDetailsModal = ({ job, onClose, onApply, isApplied, onToggleSave, isSaved }) => (
+const JobDetailsModal = ({ job, onClose, onApply, isApplied, onToggleSave, isSaved, matchScore, userSkills }) => (
   <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={onClose}>
     <div
       className="bg-white w-full max-w-2xl rounded-3xl p-8 shadow-2xl relative animate-in fade-in zoom-in duration-300 max-h-[85vh] overflow-y-auto"
@@ -49,7 +49,31 @@ const JobDetailsModal = ({ job, onClose, onApply, isApplied, onToggleSave, isSav
           </p>
         </div>
       </div>
-
+      {job?.skills?.length > 0 && (
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-semibold text-gray-700">Profile Match</span>
+            <span className={`text-sm font-bold ${matchScore >= 70 ? 'text-emerald-600' : matchScore >= 40 ? 'text-amber-500' : 'text-rose-500'}`}>
+              {matchScore}%
+            </span>
+          </div>
+          <div className="w-full h-2.5 bg-gray-100 rounded-full overflow-hidden">
+            <div
+              className={`h-full rounded-full transition-all duration-700 ${matchScore >= 70 ? 'bg-gradient-to-r from-emerald-400 to-teal-500' : matchScore >= 40 ? 'bg-gradient-to-r from-amber-400 to-orange-400' : 'bg-gradient-to-r from-rose-400 to-pink-500'}`}
+              style={{ width: `${matchScore}%` }}
+            />
+          </div>
+          <p className="text-xs text-gray-400 mt-1.5">
+            {matchScore >= 70
+              ? 'Great match — you have most of the required skills'
+              : matchScore >= 40
+                ? 'Partial match — consider brushing up on a few skills'
+                : userSkills.length === 0
+                  ? 'Add skills to your profile to see your match score'
+                  : 'Low match — this role needs skills not yet on your profile'}
+          </p>
+        </div>
+      )}
       <div className="grid grid-cols-2 gap-4 mb-6">
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-4 border border-blue-100">
           <p className="text-sm text-gray-600 mb-1">Job Type</p>
@@ -148,6 +172,7 @@ export default function AvailableJobs() {
   const [showFilters, setShowFilters] = useState(false);
 
   const [loading, setLoading] = useState(true);
+  const [userSkills, setUserSkills] = useState([]);
 
   // Fetch user data
   useEffect(() => {
@@ -161,6 +186,9 @@ export default function AvailableJobs() {
         // Set saved job IDs from backend
         if (data.savedJobs && Array.isArray(data.savedJobs)) {
           setSavedJobIds(data.savedJobs);
+        }
+        if (data.skills && Array.isArray(data.skills)) {
+          setUserSkills(data.skills);
         }
       } catch (error) {
         console.error('Failed to fetch user data:', error);
@@ -339,6 +367,26 @@ export default function AvailableJobs() {
   };
 
   const activeFiltersCount = [minSalary, workType !== 'All', searchTerm, showSavedOnly].filter(Boolean).length;
+  const computeMatchScore = (jobSkills = [], profileSkills = []) => {
+    if (!jobSkills.length || !profileSkills.length) return 0;
+    const normalize = (s) => s.toLowerCase().trim();
+    const profileSet = new Set(profileSkills.map(normalize));
+    const matched = jobSkills.filter((s) => profileSet.has(normalize(s)));
+    return Math.round((matched.length / jobSkills.length) * 100);
+  };
+
+  const matchScore = useMemo(() => {
+    if (!selectedJob) return 0;
+    return computeMatchScore(selectedJob.skills, userSkills);
+  }, [selectedJob, userSkills]);
+  const recommendedJobs = useMemo(() => {
+    if (!userSkills.length) return [];
+    return [...jobs]
+      .map((job) => ({ ...job, matchScore: computeMatchScore(job.skills, userSkills) }))
+      .filter((job) => job.matchScore > 0)
+      .sort((a, b) => b.matchScore - a.matchScore)
+      .slice(0, 5);
+  }, [jobs, userSkills]);
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-pink-50/30 to-gray-50 flex">
       <Toaster />
@@ -347,13 +395,13 @@ export default function AvailableJobs() {
       <main className={`flex-1 transition-all duration-300 ${sidebarOpen ? 'ml-64' : 'ml-0'}`}>
         {/* Top Navbar */}
         <Seekernav
-                  sidebarOpen={sidebarOpen}
-                  setSidebarOpen={setSidebarOpen}
-                  userName={userName}
-                  userRole="Job Seeker"
-                  showSearch={false}
-                  notifications={3}
-                />
+          sidebarOpen={sidebarOpen}
+          setSidebarOpen={setSidebarOpen}
+          userName={userName}
+          userRole="Job Seeker"
+          showSearch={false}
+          notifications={3}
+        />
 
         <div className="p-6">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -503,6 +551,104 @@ export default function AvailableJobs() {
               </div>
             </div>
 
+            {/* Recommended Jobs Section */}
+            {recommendedJobs.length > 0 && (
+              <section className="mb-10">
+                <div className="flex items-center gap-2 mb-5">
+                  <span className="text-2xl">🔥</span>
+                  <h2 className="text-2xl font-bold text-gray-900">Recommended for You</h2>
+                  <span className="ml-2 px-3 py-1 rounded-full bg-pink-100 text-pink-600 text-xs font-semibold">
+                    Based on your skills
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {recommendedJobs.map((job) => {
+                    const applied = appliedJobIds.includes(job.id);
+                    const saved = savedJobIds.includes(job.id);
+                    const score = job.matchScore;
+
+                    return (
+                      <div
+                        key={job.id}
+                        onClick={() => setSelectedJob(job)}
+                        className="group relative bg-white rounded-2xl shadow-sm border border-pink-100 p-6 hover:shadow-xl hover:border-pink-300 transition-all duration-300 cursor-pointer hover:-translate-y-1"
+                      >
+                        {/* Match Badge */}
+                        <div className={`absolute top-4 right-4 px-2.5 py-1 rounded-full text-xs font-bold ${score >= 70
+                            ? 'bg-emerald-100 text-emerald-700'
+                            : score >= 40
+                              ? 'bg-amber-100 text-amber-700'
+                              : 'bg-rose-100 text-rose-600'
+                          }`}>
+                          {score}% match
+                        </div>
+
+                        <div className="flex items-start gap-4 mb-4">
+                          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-pink-500/30">
+                            {(job.company || job.title || '').charAt(0)}
+                          </div>
+                          <div className="flex-1 min-w-0 pr-14">
+                            <h3 className="text-lg font-bold text-gray-900 mb-1 truncate group-hover:text-pink-600 transition-colors">
+                              {job.title}
+                            </h3>
+                            <p className="text-sm text-gray-600 flex items-center gap-1">
+                              <FaBuilding className="text-xs" />
+                              {job.company}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Mini match bar */}
+                        <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden mb-4">
+                          <div
+                            className={`h-full rounded-full ${score >= 70
+                                ? 'bg-gradient-to-r from-emerald-400 to-teal-500'
+                                : score >= 40
+                                  ? 'bg-gradient-to-r from-amber-400 to-orange-400'
+                                  : 'bg-gradient-to-r from-rose-400 to-pink-500'
+                              }`}
+                            style={{ width: `${score}%` }}
+                          />
+                        </div>
+
+                        <div className="space-y-2 mb-4 pb-4 border-b border-gray-100">
+                          <div className="flex items-center gap-2 text-sm text-gray-700">
+                            <FaMoneyBillWave className="text-emerald-500" />
+                            <span className="font-semibold">₹{Number(job.payment).toLocaleString()}</span>
+                            <span className="text-gray-400">/ month</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-sm text-gray-600">
+                            <FaClock className="text-pink-500" />
+                            <span>{job.type}</span>
+                          </div>
+                        </div>
+
+                        <div className="flex gap-3">
+                          <button
+                            onClick={(e) => { e.stopPropagation(); toggleSave(job.id); }}
+                            className="p-2 rounded-lg bg-gray-50 hover:bg-gray-100 text-gray-700 transition-colors"
+                            aria-label="Save job"
+                          >
+                            {saved ? <FaBookmark className="text-pink-600" /> : <FaRegBookmark />}
+                          </button>
+                          <button
+                            disabled={applied}
+                            onClick={(e) => { e.stopPropagation(); handleApply(job.id); }}
+                            className={`flex-1 px-4 py-2 rounded-lg font-medium transition ${applied
+                                ? 'bg-emerald-500 text-white cursor-default flex items-center justify-center gap-2'
+                                : 'bg-gradient-to-r from-pink-600 to-rose-500 text-white hover:from-pink-500 hover:to-rose-400'
+                              }`}
+                          >
+                            {applied ? <><FaCheckCircle /> Applied</> : 'Apply Now'}
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </section>
+            )}
             {/* Jobs Section */}
             <section>
               <div className="flex items-center justify-between mb-6">
@@ -642,6 +788,8 @@ export default function AvailableJobs() {
             onApply={handleApply}
             isApplied={appliedJobIds.includes(selectedJob.id)}
             onToggleSave={toggleSave}
+            matchScore={matchScore}
+            userSkills={userSkills}
             isSaved={savedJobIds.includes(selectedJob.id)}
           />
         )}

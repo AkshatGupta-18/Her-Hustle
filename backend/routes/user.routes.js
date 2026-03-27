@@ -40,7 +40,6 @@ router.post('/register', async (req, res) => {
 
     router.get('/user/:id', getJobsByUser);
 
-    module.exports = router;
 
     // Create JWT cookie
     createTokenAndCookie(res, newUser);
@@ -594,6 +593,16 @@ router.get('/saved-jobs', auth, async (req, res) => {
     res.status(200).json(user.savedJobs);
   } catch (err) {
     console.error('Get saved jobs error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// GET /api/users/me/skills
+router.get('/me/skills', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('skills');
+    res.json({ skills: user.skills || [] });
+  } catch (err) {
     res.status(500).json({ message: 'Server error' });
   }
 });

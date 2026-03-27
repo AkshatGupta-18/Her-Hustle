@@ -38,6 +38,7 @@ export default function SeekerDashboard() {
 
   const [loading, setLoading] = useState(true);
   const [visibleCount, setVisibleCount] = useState(9);
+  const [userSkills, setUserSkills] = useState([]);
 
   useEffect(() => {
     const fetchJobs = async () => {
@@ -137,10 +138,15 @@ export default function SeekerDashboard() {
 
         setUserName(data.name);
         setUserData(data);
+        console.log('skills from API:', data.skills); // 👈
+
 
         // ✅ Set saved job IDs from backend
         if (data.savedJobs && Array.isArray(data.savedJobs)) {
           setSavedJobIds(data.savedJobs);
+        }
+        if (data.skills && Array.isArray(data.skills)) {
+          setUserSkills(data.skills);
         }
       } catch (error) {
         console.error('Failed to fetch user data:', error);
@@ -268,6 +274,22 @@ export default function SeekerDashboard() {
 
 
   const displayedJobs = filteredJobs.slice(0, visibleCount);
+
+console.log('userSkills:', userSkills);
+console.log('selectedJob skills:', selectedJob?.skills);
+
+const computeMatchScore = (jobSkills = [], profileSkills = []) => {
+  if (!jobSkills.length || !profileSkills.length) return 0;
+  const normalize = (s) => s.toLowerCase().trim();
+  const profileSet = new Set(profileSkills.map(normalize));
+  const matched = jobSkills.filter((s) => profileSet.has(normalize(s)));
+  return Math.round((matched.length / jobSkills.length) * 100);
+};
+
+const matchScore = useMemo(() => {
+  if (!selectedJob) return 0;
+  return computeMatchScore(selectedJob.skills, userSkills);
+}, [selectedJob, userSkills]);
 
   /* -------------------------
      Render
@@ -495,7 +517,7 @@ export default function SeekerDashboard() {
                         <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                           <span className="text-lg font-bold text-gray-900">
                             ₹{job.payment}
-                          </span>
+                          </span> 
                           <div className="flex gap-2">
                             <button
                               onClick={(e) => {
@@ -579,6 +601,44 @@ export default function SeekerDashboard() {
                   </p>
                 </div>
               </div>
+              {/* Match Score Banner */}
+              {selectedJob?.skills?.length > 0 && (
+                <div className="mb-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-semibold text-gray-700">Profile Match</span>
+                    <span
+                      className={`text-sm font-bold ${matchScore >= 70
+                        ? 'text-emerald-600'
+                        : matchScore >= 40
+                          ? 'text-amber-500'
+                          : 'text-rose-500'
+                        }`}
+                    >
+                      {matchScore}%
+                    </span>
+                  </div>
+                  <div className="w-full h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all duration-700 ${matchScore >= 70
+                        ? 'bg-gradient-to-r from-emerald-400 to-teal-500'
+                        : matchScore >= 40
+                          ? 'bg-gradient-to-r from-amber-400 to-orange-400'
+                          : 'bg-gradient-to-r from-rose-400 to-pink-500'
+                        }`}
+                      style={{ width: `${matchScore}%` }}
+                    />
+                  </div>
+                  <p className="text-xs text-gray-400 mt-1.5">
+                    {matchScore >= 70
+                      ? 'Great match — you have most of the required skills'
+                      : matchScore >= 40
+                        ? 'Partial match — consider brushing up on a few skills'
+                        : userSkills.length === 0
+                          ? 'Add skills to your profile to see your match score'
+                          : 'Low match — this role needs skills not yet on your profile'}
+                  </p>
+                </div>
+              )}
 
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-4 border border-blue-100">
